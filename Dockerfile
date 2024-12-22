@@ -108,6 +108,7 @@ RUN mkdir /home/user
 WORKDIR /home/user
 RUN adduser -D user -s /bin/bash -u 1000 && chown user:user /home/user -R
 USER user
+
 COPY test.pl .
 
 
