@@ -103,6 +103,11 @@ RUN apk --no-cache add make \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -f /etc/ssh/ssh_host_*
 
+RUN apk --no-cache add bash
+RUN mkdir /home/user
+WORKDIR /home/user
+RUN adduser -D user -s /bin/bash -u 1000 && chown user:user /home/user -R
+USER user
 COPY test.pl .
 
 
