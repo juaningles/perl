@@ -110,7 +110,4 @@ RUN adduser -D user -s /bin/bash -u 1000 && chown user:user /home/user -R
 USER user
 
 COPY test.pl .
-
-
-# sed -Ez 's/\\[\r,\n]+\s*&&/\nRUN /mg' Dockerfile   | docker build -t test  -
-
+RUN perl test.pl
