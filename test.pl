@@ -42,19 +42,19 @@ use XML::SAX::Expat;
 use XML::Simple;
 use XSLoader;
 use List::MoreUtils;
-use JSON;
+
 use REST::Client;
 use Net::OAuth2;
 use Data::UUID;
 use Text::CSV;
 use Text::CSV_XS;
 use XML::LibXML::PrettyPrint;
-#use JSON::PP;
 use JSON;
+
 use DBI;
 use DBD::Pg;
 use DBD::mysql;
-# -> use DBD::ODBC;
+use DBD::ODBC;
 
 use Clone;
 use Text::Soundex;
@@ -79,8 +79,6 @@ use Text::Banner;
 use Text::CSV;
 use Text::CSV_XS;
 
-#use Tk;
-
 use Time::HiRes qw( time);
 use Time::Local;
 
@@ -88,7 +86,7 @@ use URI::Escape;
 
 
 use XML::Simple;
-#use YAML::XS;
+
 use POSIX qw(strftime);
 
 use REST::Client;
@@ -101,5 +99,15 @@ use URI::Encode;
 use JSON::MaybeXS;
 use Log::Log4perl;
 
+use Compress::Raw::Zlib;
+use Compress::Raw::Bzip2;
+use Hash::Merge;
+use Clone::Choose;
+use Net::Daemon;
+use RPC::PlClient;
+use Net::Azure::StorageClient::Blob;
 
 print "Test of perl libraries was successful\n"
+
+
+
