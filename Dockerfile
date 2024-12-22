@@ -104,9 +104,13 @@ RUN apk --no-cache add make \
 	&& rm -f /etc/ssh/ssh_host_*
 
 RUN apk --no-cache add bash
+
 RUN mkdir /home/user
 WORKDIR /home/user
+
 RUN adduser -D user -s /bin/bash -u 1000 && chown user:user /home/user -R
+RUN mkdir /usr/depot && chown 1000:1000 /usr/depot -R
+
 USER user
 
 COPY test.pl .
