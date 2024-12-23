@@ -32,7 +32,7 @@ runit:
 rundev: build-dev
 	docker run  -it --rm $(REPO)$(NAME):$(VERSION)-dev
 
-tag_latest:
+tag-latest:
 	docker tag $(REPO)$(NAME):$(VERSION) $(REPO)$(NAME):latest
 
 release: test tag_latest
