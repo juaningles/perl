@@ -73,6 +73,20 @@ moves the version tag to the new image. If rebuilds of the same Perl version
 need to stay distinguishable (e.g. security rebuilds), add a suffix such as
 `5.42.2-r2`.
 
+## Adding or updating modules
+
+1. Prefer an Alpine `perl-*` apk package if one exists; otherwise use `cpanm`.
+2. apk packages must be added to **both** Dockerfile stages (the runtime stage
+   installs its own apk packages; only the cpanm-built site_perl trees are
+   copied from the builder). cpanm modules go in the builder only.
+3. Add a `use` line for the module in `test.pl` — it runs as the last build
+   step, so the build fails if anything can't load.
+4. `make build && make test`. If a step fails, `make build-dev` turns every
+   `&&` into its own layer so you can bisect.
+
+See `AGENTS.md` for the full list of invariants (install order, known cpanm
+quirks, tagging rules).
+
 ## Make targets
 
 | Target             | Description                                              |
