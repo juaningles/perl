@@ -2,6 +2,9 @@ FROM alpine:3
 RUN apk --no-cache add make \
 && apk --no-cache add gcc \
 && apk --no-cache add musl-dev \
+&& apk --no-cache add openssl \
+&& apk --no-cache add openssl-dev \
+&& apk --no-cache add zlib-dev \
 && apk --no-cache add unixodbc-dev \
 && apk --no-cache add perl \
 && apk --no-cache add perl-dev \
@@ -95,6 +98,8 @@ RUN apk --no-cache add make \
 && cpanm Net::Azure::StorageClient::Blob \
     && apk del gcc \
     && apk del musl-dev \
+    && apk del openssl-dev \
+    && apk del zlib-dev \
 	&& apk cache clean \
 	&& rm -fr ./cpanm /root/.cpanm \
 	&& rm -fr ~/.cpan/build \
