@@ -2,16 +2,17 @@ VERSION = build
 NAME = perl
 PKG_NAME = perl
 REPO ?= juaningles/
+BASE_IMAGE ?= alpine:3
 
 .PHONY: all build test tag_latest release ssh push
 
 all: build
 
 build:
-	docker build -t $(REPO)$(NAME):$(VERSION) --rm .
+	docker build --build-arg BASE_IMAGE=$(BASE_IMAGE) -t $(REPO)$(NAME):$(VERSION) --rm .
 
 build-dev:
-	sed -Ez 's/\\[\r,\n]+\s*&&/\nRUN /mg' Dockerfile | docker build -t $(REPO)$(NAME):$(VERSION)-dev  -
+	sed -Ez 's/\\[\r,\n]+\s*&&/\nRUN /mg' Dockerfile | docker build --build-arg BASE_IMAGE=$(BASE_IMAGE) -t $(REPO)$(NAME):$(VERSION)-dev  -
 
 push:
 	docker push $(REPO)$(NAME):$(VERSION)
@@ -34,6 +35,14 @@ rundev: build-dev
 
 tag-latest:
 	docker tag $(REPO)$(NAME):$(VERSION) $(REPO)$(NAME):latest
+
+# Tag the built image with the perl version it actually contains, e.g. juaningles/perl:5.42.2
+tag-perl-version:
+	docker tag $(REPO)$(NAME):$(VERSION) $(REPO)$(NAME):$$(docker run --rm $(REPO)$(NAME):$(VERSION) perl -e 'printf("%vd", $$^V)')
+
+# Print the perl version inside the built image
+perl-version:
+	@docker run --rm $(REPO)$(NAME):$(VERSION) perl -e 'printf("%vd\n", $$^V)'
 
 release: test tag_latest
 	@if ! docker images $(NAME) | awk '{ print $$2 }' | grep -q -F $(VERSION); then echo "$(NAME) version $(VERSION) is not yet built. Please run 'make build'"; false; fi

@@ -1,4 +1,7 @@
-FROM alpine:3
+ARG BASE_IMAGE=alpine:3
+
+# builder
+FROM ${BASE_IMAGE} AS builder
 RUN apk --no-cache add make \
 && apk --no-cache add gcc \
 && apk --no-cache add musl-dev \
@@ -10,8 +13,9 @@ RUN apk --no-cache add make \
 && apk --no-cache add perl-dev \
 && apk --no-cache add perl-app-cpanminus \
 && apk --no-cache add perl-app-cpm \
-&& apk --no-cache add perl-b-cow \
-&& cpanm URI \
+&& apk --no-cache add perl-b-cow
+
+RUN cpanm URI \
 && cpanm Net::HTTP \
 && cpanm IO::HTML \
 && cpanm Encode::Locale \
@@ -33,8 +37,9 @@ RUN apk --no-cache add make \
 && cpanm LWP::UserAgent \
 && cpanm Mozilla::CA \
 && cpanm Net::SSLeay \
-&& apk --no-cache add perl-lwp-protocol-https \
-&& cpanm Algorithm::Diff \
+&& apk --no-cache add perl-lwp-protocol-https
+
+RUN cpanm Algorithm::Diff \
 && cpanm Spiffy \
 && cpanm Text::Diff \
 && apk --no-cache add perl-test-base \
@@ -51,8 +56,9 @@ RUN apk --no-cache add make \
 && apk --no-cache add perl-task-weaken \
 && apk --no-cache add perl-mime-types \
 && cpanm XML::SAX::Expat \
-&& apk --no-cache add perl-xml-simple \
-&& cpanm XSLoader \
+&& apk --no-cache add perl-xml-simple
+
+RUN cpanm XSLoader \
 && cpanm List::MoreUtils \
 && cpanm JSON \
 && apk --no-cache add perl-json-xs \
@@ -76,8 +82,9 @@ RUN apk --no-cache add make \
 && apk --no-cache add perl-uri-encode \
 && apk --no-cache add perl-log-log4perl \
 && cpanm IO::SessionData \
-&& apk --no-cache add perl-test-requires \
-&& cpanm XML::Parser::Lite --force \
+&& apk --no-cache add perl-test-requires
+
+RUN cpanm XML::Parser::Lite --force \
 && cpanm SOAP::Lite \
 && cpanm ServiceNow::SOAP \
 && cpanm Clone::Choose \
@@ -95,20 +102,56 @@ RUN apk --no-cache add make \
 && cpanm YAML::XS \
 && cpanm Net::Daemon \
 && cpanm RPC::PlClient \
-&& cpanm Net::Azure::StorageClient::Blob \
-    && apk del gcc \
-    && apk del musl-dev \
-    && apk del openssl-dev \
-    && apk del zlib-dev \
-	&& apk cache clean \
-	&& rm -fr ./cpanm /root/.cpanm \
-	&& rm -fr ~/.cpan/build \
-    && rm -rf /var/cache/apk/* \
-	&& rm -rf /tmp/* /var/tmp/* \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& rm -f /etc/ssh/ssh_host_*
+&& cpanm Net::Azure::StorageClient::Blob
 
-RUN apk --no-cache add bash
+# runtime image
+FROM ${BASE_IMAGE}
+RUN apk --no-cache add make \
+&& apk --no-cache add openssl \
+&& apk --no-cache add libx11 \
+&& apk --no-cache add libpng \
+&& apk --no-cache add bash \
+&& apk --no-cache add perl \
+&& apk --no-cache add perl-app-cpanminus \
+&& apk --no-cache add perl-app-cpm \
+&& apk --no-cache add perl-b-cow \
+&& apk --no-cache add perl-clone \
+&& apk --no-cache add perl-module-build-tiny \
+&& apk --no-cache add perl-http-daemon \
+&& apk --no-cache add perl-lwp-protocol-https \
+&& apk --no-cache add perl-test-base \
+&& apk --no-cache add perl-test-yaml \
+&& apk --no-cache add perl-yaml \
+&& apk --no-cache add perl-xml-namespacesupport \
+&& apk --no-cache add perl-xml-sax-base \
+&& apk --no-cache add perl-xml-sax \
+&& apk --no-cache add perl-xml-libxml \
+&& apk --no-cache add perl-test-warnings \
+&& apk --no-cache add perl-exporter-tiny \
+&& apk --no-cache add perl-xml-parser \
+&& apk --no-cache add perl-sub-uplevel \
+&& apk --no-cache add perl-task-weaken \
+&& apk --no-cache add perl-mime-types \
+&& apk --no-cache add perl-xml-simple \
+&& apk --no-cache add perl-json-xs \
+&& apk --no-cache add perl-data-uuid \
+&& apk --no-cache add perl-dbi \
+&& apk --no-cache add perl-dbd-pg \
+&& apk --no-cache add perl-dbd-csv \
+&& apk --no-cache add perl-dbd-mysql \
+&& apk --no-cache add perl-dbd-sqlite \
+&& apk --no-cache add perl-dbd-odbc \
+&& apk --no-cache add perl-text-soundex \
+&& apk --no-cache add perl-sql-statement \
+&& apk --no-cache add perl-class-inspector \
+&& apk --no-cache add perl-test-warn \
+&& apk --no-cache add perl-uri-encode \
+&& apk --no-cache add perl-log-log4perl \
+&& apk --no-cache add perl-test-requires
+
+COPY --from=builder /usr/local/share/perl5/site_perl /usr/local/share/perl5/site_perl
+COPY --from=builder /usr/local/lib/perl5/site_perl /usr/local/lib/perl5/site_perl
+COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
 RUN mkdir /home/user
 WORKDIR /home/user
